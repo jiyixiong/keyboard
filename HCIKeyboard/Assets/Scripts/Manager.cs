@@ -16,13 +16,20 @@ public class Manager : MonoBehaviour
     [SerializeField] private int index;//instruction index
 
     [SerializeField]
-    private GameObject keyboard;
+    private GameObject leftkeyboard;
+    private GameObject rightkeyboard;
     private KeyboardStatus keyboardstatus;
+    private LeftKeyboard leftKeyboardstatus;
+    private RightKeyboard rightKeyboardstatus;
+
 
     //Methods
     void Start()
     {
-        keyboardstatus = keyboard.GetComponent<KeyboardStatus>();//get status
+
+
+        leftKeyboardstatus = leftkeyboard.GetComponent<LeftKeyboard>();//get status
+        rightKeyboardstatus  = rightkeyboard.GetComponent<RightKeyboard>();//get status
         Debug.Log("manager");
         /*TextAsset txtAsset = (TextAsset)Resources.Load("phrases", typeof(TextAsset));
 

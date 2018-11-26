@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KeyboardTaskCreator : KeyboardTaskComponent
+public class KeyboardTaskCreator : KeyboardComponent
 {
     [SerializeField]
     private string clickHandle;
 
-    private KeyboardTaskItem[] keys;
+    private KeyboardItem[] keys;
 
     //Materials
     [SerializeField]
@@ -37,9 +37,9 @@ public class KeyboardTaskCreator : KeyboardTaskComponent
 
     public void InitKeys()
     {
-        if (keys == null || KeyboardTaskItem.forceInit)
+        if (keys == null || KeyboardItem.forceInit)
         {
-            List<KeyboardTaskItem> allKeys = new List<KeyboardTaskItem>(GetComponentsInChildren<KeyboardTaskItem>());
+            List<KeyboardItem> allKeys = new List<KeyboardItem>(GetComponentsInChildren<KeyboardItem>());
             for (int i = 0; i < allKeys.Count; i++)
             {
                 allKeys[i].position = i;
@@ -51,7 +51,7 @@ public class KeyboardTaskCreator : KeyboardTaskComponent
 
     public void ChangeMaterialOnKeys()
     {
-        foreach (KeyboardTaskItem key in keys)
+        foreach (KeyboardItem key in keys)
             key.SetMaterials(keyNormalMaterial, keySelectedMaterial, keyPressedMaterial);
     }
 
@@ -62,16 +62,16 @@ public class KeyboardTaskCreator : KeyboardTaskComponent
 
     private void FillAndPlaceKeys()
     {
-        foreach (KeyboardTaskItem key in keys)
-            key.SetKeyText(KeyboardTaskItem.KeyLetterEnum.LowerCase);
+        foreach (KeyboardItem key in keys)
+            key.SetKeyText(KeyboardItem.KeyLetterEnum.LowerCase);
     }
 
     private void SetComponents()
     {
-        KeyboardTaskRaycaster rayCaster = GetComponent<KeyboardTaskRaycaster>();
-        rayCaster.SetClickButton(ClickHandle);
-        KeyboardTaskStatus status = GetComponent<KeyboardTaskStatus>();
-        status.SetKeys(keys);
+       // KeyboardTaskRaycaster rayCaster = GetComponent<KeyboardTaskRaycaster>();
+        //rayCaster.SetClickButton(ClickHandle);
+        KeyboardStatus status = GetComponent<KeyboardStatus>();
+      //  status.SetKeys(keys);
     }
 
     public string ClickHandle
@@ -82,9 +82,9 @@ public class KeyboardTaskCreator : KeyboardTaskComponent
         }
         set
         {
-            clickHandle = value;
-            KeyboardTaskRaycaster rayCaster = GetComponent<KeyboardTaskRaycaster>();
-            rayCaster.SetClickButton(clickHandle);
+          //  clickHandle = value;
+            //KeyboardTaskRaycaster rayCaster = GetComponent<KeyboardTaskRaycaster>();
+            //rayCaster.SetClickButton(clickHandle);
         }
     }
 

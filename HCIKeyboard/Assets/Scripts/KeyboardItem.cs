@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using HoloToolkit.Unity.InputModule;
 
-public class KeyboardTaskItem : KeyboardTaskComponent, IInputClickHandler
-{
+public class KeyboardItem : KeyboardComponent
+{ 
     public static bool forceInit = true;
 
     //information
@@ -144,12 +143,6 @@ public class KeyboardTaskItem : KeyboardTaskComponent, IInputClickHandler
         this.keyNormalMaterial = keyNormalMaterial;
         this.keySelectedMaterial = keySelectedMaterial;
         this.keyPressedMaterial = keyPressedMaterial;
-    }
-
-    public void OnInputClicked(InputClickedEventData eventData)
-    {
-        getclicked = true;
-        Debug.Log("click,airtap,letter");
     }
 }
 

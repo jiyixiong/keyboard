@@ -17,7 +17,7 @@ public class KeyboardStatus : KeyboardComponent
     [SerializeField]
     public bool isReflectionPossible;
 
-    private KeyboardTaskItem[] keys;
+    private KeyboardItem[] keys;
     private bool areLettersActive = true;
     private bool isLowercase = true;
 
@@ -33,13 +33,13 @@ public class KeyboardStatus : KeyboardComponent
         //Debug.Log(typeHolder);
     }
 
-    public void SetKeys(KeyboardTaskItem[] keys)
+    public void SetKeys(KeyboardItem[] keys)
     {
         Debug.Log("Status Creat");
         this.keys = keys;
     }
 
-    public void HandleClick(KeyboardTaskItem clicked)
+    public void HandleClick(KeyboardItem clicked)
     {
         string value = clicked.GetLetter();
         if (value.Equals(QEH) || value.Equals(ABC))// special signs pressed
