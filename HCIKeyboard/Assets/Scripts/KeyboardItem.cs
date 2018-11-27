@@ -2,10 +2,10 @@
 using UnityEngine.UI;
 
 public class KeyboardItem : KeyboardComponent
-{ 
+{
     public static bool forceInit = true;
 
-	public bool isLeft = false;
+    public bool isLeft = false;
 
     //information
     private Text letter;
@@ -16,6 +16,7 @@ public class KeyboardItem : KeyboardComponent
     //click
     public bool getclicked = false;
     private bool clicked = false;
+    public bool held = false;
     private float clickHoldTimer = 0f;
     private float clickHoldTimeLimit = 0.15f;
 
@@ -63,9 +64,9 @@ public class KeyboardItem : KeyboardComponent
         ChangeDisplayedMaterial(keyNormalMaterial);
     }
 
-	 public void GetHolding()//cursor left
+    public void GetHolding()//cursor left
     {
-        ChangeDisplayedMaterial(keyPressedMaterial);
+        ChangeDisplayedMaterial(keySelectedMaterial);
     }
 
     //click & holdclick
@@ -121,14 +122,14 @@ public class KeyboardItem : KeyboardComponent
     public void SetKeyText(int line)
     {
         string value = "";
-        if(this.isLeft)
-			value = leftLetters[line*5+position];
-		else if(!this.isLeft)
-			{
-				value = rightLetters[position];
-				letter.fontSize=4;
-			}
-		Debug.Log(value);
+        if (this.isLeft)
+            value = leftLetters[line * 5 + position];
+        else if (!this.isLeft)
+        {
+            value = rightLetters[position];
+            letter.fontSize = 4;
+        }
+        Debug.Log(value);
         if (!letter.text.Equals(value))
         {
             letter.text = value;
@@ -146,6 +147,51 @@ public class KeyboardItem : KeyboardComponent
         this.keyNormalMaterial = keyNormalMaterial;
         this.keySelectedMaterial = keySelectedMaterial;
         this.keyPressedMaterial = keyPressedMaterial;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+
+        string cursorname = other.gameObject.name;
+        Debug.Log(cursorname);
+        
+        if(cursorname.Equals("LeftCursor")&&this.isLeft)
+            {
+                GetHolding();
+                held = true;
+            }
+        else if(cursorname.Equals("RightCursor")&&!this.isLeft)
+            {
+                GetHolding();
+                held = true;
+            }
+
+
+
+    }
+    void OnTriggerExit(Collider other)
+    {
+
+        string cursorname = other.gameObject.name;
+        Debug.Log(cursorname);
+       
+        if(cursorname.Equals("LeftCursor")&&this.isLeft)
+            {
+                StopHolding();
+                held = false;
+            }
+        else if(cursorname.Equals("RightCursor")&&!this.isLeft)
+            
+            {
+                StopHolding();
+                held = false;
+            }
+
+
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("get");
     }
 }
 
