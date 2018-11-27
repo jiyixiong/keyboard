@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{7EEBB4E9-2B82-C74A-56C2-01FBC9CF0D64}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HCIKeyboard", "Assembly-CSharp.csproj", "{7EEBB4E9-2B82-C74A-56C2-01FBC9CF0D64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{87BDEBE1-5E3A-98F8-91B2-37E8982D82BB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HCIKeyboard", "Assembly-CSharp-Editor.csproj", "{87BDEBE1-5E3A-98F8-91B2-37E8982D82BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
