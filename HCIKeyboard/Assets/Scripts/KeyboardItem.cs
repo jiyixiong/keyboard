@@ -15,7 +15,7 @@ public class KeyboardItem : KeyboardComponent
 
     //click
     public bool getclicked = false;
-    private bool clicked = false;
+    public bool clicked = false;
     public bool held = false;
     private float clickHoldTimer = 0f;
     private float clickHoldTimeLimit = 0.15f;

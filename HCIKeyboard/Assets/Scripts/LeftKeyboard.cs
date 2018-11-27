@@ -53,7 +53,36 @@ public class LeftKeyboard : KeyboardComponent
         // else// Normal letter
         //     TypeKey(value[0]);
     }
+    public string getClick()
+    {
+        for (int i = 0; i < keys.Length; i++)
+        {
+            if (keys[i].held)
+            {
+                if(!keys[i].clicked)
+                    {
+                        keys[i].Click();
+                        return keys[i].GetLetter();
+                    }
+            }
+        }
+        return "";
+    }
+    public void cancelClick()
+    {
+        for (int i = 0; i < keys.Length; i++)
+        {
+            keys[i].clicked = false;
+        }
+    }
 
+    public void setBtn(int pos)
+    {
+        for (int i = 0; i < keys.Length; i++)
+        {
+            keys[i].SetKeyText(pos);
+        }
+    }
     //Change keyboard
     private void ChangeSpecialLetters()
     {
