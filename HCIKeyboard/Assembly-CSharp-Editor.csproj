@@ -110,6 +110,7 @@
     <Compile Include="Assets\LeapMotion\Core\Scripts\Utils\Editor\UtilsTests.cs" />
     <Compile Include="Assets\LeapMotion\Core\Scripts\XR\Editor\LeapEyeDislocatorEditor.cs" />
     <Compile Include="Assets\LeapMotion\Core\Scripts\XR\Editor\XRHeightOffsetEditor.cs" />
+    <Compile Include="Assets\LeapMotion\Modules\Hands\Scripts\Editor\LeapHandsAutoRigEditor.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/syt/Desktop/HCI/keyboard/HCIKeyboard/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>

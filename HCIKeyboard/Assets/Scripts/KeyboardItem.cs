@@ -5,6 +5,8 @@ public class KeyboardItem : KeyboardComponent
 { 
     public static bool forceInit = true;
 
+	public bool isLeft = false;
+
     //information
     private Text letter;
     public int position;
@@ -61,6 +63,11 @@ public class KeyboardItem : KeyboardComponent
         ChangeDisplayedMaterial(keyNormalMaterial);
     }
 
+	 public void GetHolding()//cursor left
+    {
+        ChangeDisplayedMaterial(keyPressedMaterial);
+    }
+
     //click & holdclick
     public void Click()
     {
@@ -111,21 +118,17 @@ public class KeyboardItem : KeyboardComponent
 
     //change information
     //button
-    public void SetKeyText(KeyLetterEnum letterType)
+    public void SetKeyText(int line)
     {
         string value = "";
-        switch (letterType)
-        {
-            case KeyLetterEnum.LowerCase:
-                value = allLettersLowercase[Position];
-                break;
-            case KeyLetterEnum.UpperCase:
-                value = allLettersUppercase[Position];
-                break;
-            case KeyLetterEnum.NonLetters:
-                value = allSpecials[Position];
-                break;
-        }
+        if(this.isLeft)
+			value = leftLetters[line*5+position];
+		else if(!this.isLeft)
+			{
+				value = rightLetters[position];
+				letter.fontSize=4;
+			}
+		Debug.Log(value);
         if (!letter.text.Equals(value))
         {
             letter.text = value;

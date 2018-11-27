@@ -247,10 +247,15 @@
     <Compile Include="Assets\LeapMotion\Core\Scripts\Utils\XRSupportUtil.cs" />
     <Compile Include="Assets\LeapMotion\Core\Scripts\XR\LeapEyeDislocator.cs" />
     <Compile Include="Assets\LeapMotion\Core\Scripts\XR\XRHeightOffset.cs" />
+    <Compile Include="Assets\LeapMotion\Modules\Hands\Examples\Scripts\CenterTransformOnCam.cs" />
+    <Compile Include="Assets\LeapMotion\Modules\Hands\Examples\Scripts\CycleHandPairs.cs" />
+    <Compile Include="Assets\LeapMotion\Modules\Hands\Scripts\LeapHandsAutoRig.cs" />
+    <Compile Include="Assets\LeapMotion\Modules\Hands\Scripts\MinimalHand.cs" />
+    <Compile Include="Assets\LeapMotion\Modules\Hands\Scripts\PolyFinger.cs" />
+    <Compile Include="Assets\LeapMotion\Modules\Hands\Scripts\PolyHand.cs" />
+    <Compile Include="Assets\Scripts\Creator.cs" />
     <Compile Include="Assets\Scripts\KeyboardComponent.cs" />
-    <Compile Include="Assets\Scripts\KeyboardCreator.cs" />
     <Compile Include="Assets\Scripts\KeyboardItem.cs" />
-    <Compile Include="Assets\Scripts\KeyboardStatus.cs" />
     <Compile Include="Assets\Scripts\LeftKeyboard.cs" />
     <Compile Include="Assets\Scripts\Manager.cs" />
     <Compile Include="Assets\Scripts\RightKeyboard.cs" />
