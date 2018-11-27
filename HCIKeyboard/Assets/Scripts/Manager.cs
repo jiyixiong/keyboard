@@ -23,8 +23,10 @@ public class Manager : MonoBehaviour
     private LeftKeyboard leftKeyboardstatus;
     private RightKeyboard rightKeyboardstatus;
 
+    private TextMesh inputText;
 
-  public static bool Gesture_left = false;
+
+    public static bool Gesture_left = false;
     public static bool Gesture_right = false;
     public static bool Gesture_up = false;
     public static bool Gesture_down = false;
@@ -54,6 +56,7 @@ public class Manager : MonoBehaviour
         leftKeyboardstatus = leftkeyboard.GetComponent<LeftKeyboard>();//get status
         rightKeyboardstatus = rightkeyboard.GetComponent<RightKeyboard>();//get status
 		mProvider = FindObjectOfType<LeapProvider>() as LeapProvider;
+        inputText = GameObject.Find("inputText").GetComponent<TextMesh>();
         Debug.Log("manager");
         /*TextAsset txtAsset = (TextAsset)Resources.Load("phrases", typeof(TextAsset));
 
@@ -142,5 +145,11 @@ public class Manager : MonoBehaviour
         return (count == 5);
     }
 
+    public void addInputText(String inputString){ //输入框加入字符
+        inputText.text = inputText.text + inputString;
+    }
 
+    public void delInputText(){ //删除一个字符
+        inputText.text = inputText.text.Remove(inputText.text.Length-1);
+    }
 }
