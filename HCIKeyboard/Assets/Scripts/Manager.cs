@@ -23,14 +23,16 @@ public class Manager : MonoBehaviour
     private LeftKeyboard leftKeyboardstatus;
     private RightKeyboard rightKeyboardstatus;
 
+    [SerializeField] private TextMesh inputText;
 
-  public static bool Gesture_left = false;
+
+    public static bool Gesture_left = false;
     public static bool Gesture_right = false;
     public static bool Gesture_up = false;
     public static bool Gesture_down = false;
     public static bool Gesture_zoom = false;
     public static float movePOs = 0.0f;
- 
+
     [SerializeField] private LeapProvider mProvider;
     private Frame mFrame;
     private Hand mHand;
@@ -46,6 +48,9 @@ public class Manager : MonoBehaviour
     [Range(0, 1)]
     public float deltaVelocity = 1.0f;//单方向上手掌移动的速度
 
+
+    [SerializeField] private PositionMapper mapper;
+
     //Methods
     void Start()
     {
@@ -53,7 +58,10 @@ public class Manager : MonoBehaviour
 
         leftKeyboardstatus = leftkeyboard.GetComponent<LeftKeyboard>();//get status
         rightKeyboardstatus = rightkeyboard.GetComponent<RightKeyboard>();//get status
-		mProvider = FindObjectOfType<LeapProvider>() as LeapProvider;
+        mapper = GetComponent<PositionMapper>();
+        mProvider = FindObjectOfType<LeapProvider>() as LeapProvider;
+        inputText = GameObject.Find("input").GetComponent<TextMesh>();
+        inputText.text = "";
         Debug.Log("manager");
         /*TextAsset txtAsset = (TextAsset)Resources.Load("phrases", typeof(TextAsset));
 
@@ -72,22 +80,13 @@ public class Manager : MonoBehaviour
 
     void Update()
     {
-        /*
-        if (input.text == words[index])//check that whether input  is correct
-        {
-            keyboardstatus.output = "";
-            index += 1;
-            input.text = "";
-            if (index >= words.Length)
-                index = 0;
-            instruction.text = String.Format(" \"{0}\" ", words[index]);
-        }*/
-		  mFrame = mProvider.CurrentFrame;//获取当前帧
-                                      //获得手的个数
-
-
-        //print ("hand num are " + mFrame.Hands.Count);
-        
+        cleanText();
+        listenleftdown();
+        listenrightdown();
+    }
+    void cleanText()
+    {
+		  mFrame = mProvider.CurrentFrame;
         //判断是否为握拳状态
         //遍历所有的手
         foreach (Hand hand in mFrame.Hands)
@@ -106,33 +105,21 @@ public class Manager : MonoBehaviour
             
         }
 		if(myBool)
-			{
-            List<KeyboardItem> allleftKeys = new List<KeyboardItem>(this.leftkeyboard.GetComponentsInChildren<KeyboardItem>());
-            for (int i = 0; i < allleftKeys.Count; i++)
-                allleftKeys[i].GetHolding();
-            List<KeyboardItem> allrightKeys = new List<KeyboardItem>(this.rightkeyboard.GetComponentsInChildren<KeyboardItem>());
-            for (int i = 0; i < allrightKeys.Count; i++)
-                allrightKeys[i].GetHolding();
+
+                    delInputText();
       
-			}
-			else{
-				List<KeyboardItem> allleftKeys = new List<KeyboardItem>(this.leftkeyboard.GetComponentsInChildren<KeyboardItem>());
-            for (int i = 0; i < allleftKeys.Count; i++)
-                allleftKeys[i].StopHolding();
-            List<KeyboardItem> allrightKeys = new List<KeyboardItem>(this.rightkeyboard.GetComponentsInChildren<KeyboardItem>());
-            for (int i = 0; i < allrightKeys.Count; i++)
-                allrightKeys[i].StopHolding();
-			}
+
+
     }
-	  protected bool isCloseHand(Hand hand)     //是否握拳 
+    protected bool isCloseHand(Hand hand)     //是否握拳 
     {
         List<Finger> listOfFingers = hand.Fingers;
         int count = 0;
         for (int f = 0; f < listOfFingers.Count; f++)
         { //循环遍历所有的手~~
             Finger finger = listOfFingers[f];
-            if ((finger.TipPosition - hand.PalmPosition).Magnitude < 0.08f)    // Magnitude  向量的长度 。是(x*x+y*y+z*z)的平方根。
-                                                                                          //float deltaCloseFinger = 0.05f;
+            if ((finger.TipPosition - hand.PalmPosition).Magnitude < 0.06f)    // Magnitude  向量的长度 。是(x*x+y*y+z*z)的平方根。
+                                                                               //float deltaCloseFinger = 0.05f;
             {
                 count++;
                 //if (finger.Type == Finger.FingerType.TYPE_THUMB)
@@ -141,6 +128,42 @@ public class Manager : MonoBehaviour
         }
         return (count == 5);
     }
+    void listenleftdown()
+    {
+        if (mapper.LeftCursorDown)
+        {
+            string letter = leftKeyboardstatus.getClick();
+            if (!letter.Equals(""))
+            {
+                addInputText(letter);
+            }
 
+        }
+        else
+            leftKeyboardstatus.cancelClick();
+    }
+    void listenrightdown()
+    {
+        if (mapper.RightCursorDown)
+        {
+            int btn = rightKeyboardstatus.getClick();
+            if (btn != -1)
+                {
+                    Debug.Log(btn);
+                    leftKeyboardstatus.setBtn(btn);
+                }
 
+        }
+        else
+            rightKeyboardstatus.cancelClick();
+    }
+    public void addInputText(String inputString)
+    { //输入框加入字符
+        inputText.text = inputText.text + inputString;
+    }
+
+    public void delInputText()
+    { //删除一个字符
+        inputText.text = inputText.text.Remove(inputText.text.Length - 1);
+    }
 }

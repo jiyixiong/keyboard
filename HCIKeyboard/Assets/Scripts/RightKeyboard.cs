@@ -54,6 +54,28 @@ public class RightKeyboard : KeyboardComponent
         //     TypeKey(value[0]);
     }
 
+    public int getClick()
+    {
+        for (int i = 0; i < keys.Length; i++)
+        {
+            if (keys[i].held)
+            {
+                if(!keys[i].clicked)
+                    {
+                        keys[i].Click();
+                        return keys[i].position;
+                    }
+            }
+        }
+        return -1;
+    }
+   public void cancelClick()
+    {
+        for (int i = 0; i < keys.Length; i++)
+        {
+            keys[i].clicked = false;
+        }
+    }
     //Change keyboard
     private void ChangeSpecialLetters()
     {
