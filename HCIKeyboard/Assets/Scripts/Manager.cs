@@ -30,6 +30,13 @@ public class Manager : MonoBehaviour
     private NumToStrList translator;
     private List<string> results;
 
+    private bool cursor_down;
+    private bool select_down;
+
+
+    private string query_string = "";
+    private int level;
+    private bool only_right = true;
 
     //test
     public static bool Gesture_left = false;
@@ -39,8 +46,6 @@ public class Manager : MonoBehaviour
     public static bool Gesture_zoom = false;
     public static float movePOs = 0.0f;
 
-    private string query_string = "";
-    private bool only_right = true;
 
     [SerializeField] private LeapProvider mProvider;
     private Frame mFrame;
@@ -65,6 +70,7 @@ public class Manager : MonoBehaviour
     void Start()
     {
         initKeyboard();
+        //listenCursordown();
         /*TextAsset txtAsset = (TextAsset)Resources.Load("phrases", typeof(TextAsset));
 
         words = txtAsset.text.Split('\n');
@@ -84,11 +90,15 @@ public class Manager : MonoBehaviour
     {
         //checkOnlyRight();
         //cleanText();
-        listenCursordown();
-        listenSelectdown();
-        listenBack();
-        listenSelectGestrue();
-        listenGesture();
+
+        if(only_right)
+        {
+            listenCursordown();
+            listenSelectdown();
+            listenBack();
+            listenSelectGestrue();
+            listenGesture();
+        }
     }
 
      void initKeyboard()
@@ -103,10 +113,15 @@ public class Manager : MonoBehaviour
         hintsText.text = "";
         
         query_string = "";
+        level = 0;
         results = new List<string>();
         translator = new NumToStrList();
 
         only_right = true;
+
+        cursor_down = false;
+        select_down = false;
+
         Debug.Log("manager init");
     }
 
@@ -118,13 +133,19 @@ public class Manager : MonoBehaviour
 
     void listenCursordown()
     {
-        if(mapper.CursonDown())
+        if(mapper.CursonDown()&& !cursor_down)
         {
+            this.level = 0;
             int pos = mapper.CursorPosition();
             query_string += pos.ToString();
-            this.results = translator.query(query_string);//query
+            this.results = translator.getStrList(query_string,level);//query
             setHints(1);
+            cursor_down = true;
         }
+        else
+            cursor_down =false;
+
+        //old version
         // if (mapper.LeftCursorDown)
         // {
         //     string letter = leftKeyboardstatus.getClick();
@@ -139,7 +160,32 @@ public class Manager : MonoBehaviour
     }
     void listenSelectdown()
     {
-        
+        if(mapper.SelectDown() && !select_down)
+        {
+            int finger = mapper.SelectPosition();
+            if(finger == 0)
+            {
+                addInputText(" ");
+                select_down = true;
+            }
+            else if(finger < results.Count)
+            {
+                addInputText(results[finger]);
+                query_string = "";
+                level = 0;
+                results.Clear();
+                setHints(1);
+                select_down = true;
+            }
+            else
+            {
+                select_down = true;
+                return;
+            }
+
+        }
+        else
+            select_down = false;
         //
         // if (mapper.RightCursorDown)
         // {
@@ -163,18 +209,43 @@ public class Manager : MonoBehaviour
     {
         if(mapper.BackSpaceDown())
         {
-            
-
+            delInputText();
         }
     }
 
     void listenSelectGestrue()
     {
-
+        int index = mapper.SelectPosition();
+        if(index==0 || index >= results.Count)
+        {
+            setHints(1);
+        }
+        else
+        {
+            setHints(index);
+        }
     }
     void listenGesture()
     {
-
+        if(mapper.SelectLeft()&&results.Count==5)
+        {
+            level++;
+            List<string> cur_results = translator.getStrList(query_string,level);//query
+            if(cur_results.Count > 0)
+                this.results = cur_results;
+            else
+                level--;
+            setHints(1);
+            
+        }
+        else if(mapper.SelectRight()&&level>0)
+        {
+            level--;
+            this.results = translator.getStrList(query_string,level);//query
+            setHints(1);
+        }
+        else    
+            return;
     }
     public void addInputText(String inputString)
     { //输入框加入字符
@@ -204,7 +275,7 @@ public class Manager : MonoBehaviour
                 hints += "  ";
             }
         }
-        hintsText.text = red_left + "aaa" + red_right;
+        hintsText.text = hints;
     }
 
 
