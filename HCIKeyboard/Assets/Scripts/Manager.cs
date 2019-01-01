@@ -34,6 +34,10 @@ public class Manager : MonoBehaviour
     private bool select_down;
 
 
+    private string query_string = "";
+    private int level;
+    private bool only_right = true;
+
     //test
     public static bool Gesture_left = false;
     public static bool Gesture_right = false;
@@ -42,9 +46,6 @@ public class Manager : MonoBehaviour
     public static bool Gesture_zoom = false;
     public static float movePOs = 0.0f;
 
-    private string query_string = "";
-    private int level;
-    private bool only_right = true;
 
     [SerializeField] private LeapProvider mProvider;
     private Frame mFrame;
@@ -90,12 +91,14 @@ public class Manager : MonoBehaviour
         //checkOnlyRight();
         //cleanText();
 
-
-        listenCursordown();
-        listenSelectdown();
-        listenBack();
-        listenSelectGestrue();
-        listenGesture();
+        if(only_right)
+        {
+            listenCursordown();
+            listenSelectdown();
+            listenBack();
+            listenSelectGestrue();
+            listenGesture();
+        }
     }
 
      void initKeyboard()
