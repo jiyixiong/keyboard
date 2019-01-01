@@ -97,15 +97,15 @@ public class Manager : MonoBehaviour
         //checkOnlyRight();
         //cleanText();
 
-        if(only_right)
-        {
+        
             listenCursor();
             listenCursordown();
             listenSelectdown();
             listenBack();
             listenSelectGestrue();
             listenGesture();
-        }
+            Debug.Log(query_string);
+        
     }
 
      void initKeyboard()
@@ -146,9 +146,11 @@ public class Manager : MonoBehaviour
     void listenCursor()
     {
         int now_pos = controller.CursorPosition;
+        //Debug.Log(now_pos);
         if(now_pos != cur_pos)
         {
             rightKeyboardstatus.cancelHold(cur_pos);
+            cur_pos = now_pos;
             rightKeyboardstatus.setHold(cur_pos);
         }
     }
@@ -159,11 +161,12 @@ public class Manager : MonoBehaviour
             this.level = 0;
             int pos = controller.CursorPosition;
             query_string += pos.ToString();
+            
             this.results = translator.getStrList(query_string,level);//query
             setHints(1);
             cursor_down = true;
         }
-        else
+        else if(!controller.CursorDown)
             cursor_down =false;
 
         //old version
@@ -191,7 +194,7 @@ public class Manager : MonoBehaviour
             }
             else if(finger < results.Count)
             {
-                addInputText(results[finger]);
+                addInputText(results[finger-1]);
                 query_string = "";
                 level = 0;
                 results.Clear();
@@ -205,7 +208,7 @@ public class Manager : MonoBehaviour
             }
 
         }
-        else
+        else if(!controller.SelectDown)
             select_down = false;
         //
         // if (controller.RightCursorDown)
@@ -228,19 +231,31 @@ public class Manager : MonoBehaviour
 
     void listenBack()
     {
-        if(controller.BackSpaceDown&& !backsapce)
+        if(controller.BackSpaceDown && !backsapce)
         {
+            Debug.Log("get back");
             backsapce = true;
-            delInputText();
+            if(query_string.Length > 0)
+            {
+                query_string = query_string.Remove(query_string.Length - 1);
+                level = 0;
+                
+                this.results = translator.getStrList(query_string,level);//query
+                if(query_string.Length == 0)
+                    this.results.Clear();
+                setHints(1);
+            }
+            else
+                delInputText();
         }
-        else
+        else if(!controller.BackSpaceDown)
             backsapce = false;
     }
 
     void listenSelectGestrue()
     {
         int index = controller.SelectPosition;
-        if(index==0 || index >= results.Count)
+        if(index==0 || index > results.Count)
         {
             setHints(1);
         }
@@ -287,7 +302,8 @@ public class Manager : MonoBehaviour
 
     public void delInputText()
     { //删除一个字符
-        inputText.text = inputText.text.Remove(inputText.text.Length - 1);
+        if(inputText.text != "")
+            inputText.text = inputText.text.Remove(inputText.text.Length - 1);
     }
 
     void setHints(int index)

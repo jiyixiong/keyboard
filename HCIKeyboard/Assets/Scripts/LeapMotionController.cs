@@ -15,7 +15,7 @@ using System;
 public class LeapMotionController : MonoBehaviour {
 
     private double DeltaZ = 0.03;
-    private double ButtonInterval = 0.03;
+    private double ButtonInterval = 0.025;
 
     private Vector3 LeftHandCenter;
 

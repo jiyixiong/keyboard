@@ -66,7 +66,7 @@ public class KeyboardItem : KeyboardComponent
 
     public void GetHolding()//cursor left
     {
-        ChangeDisplayedMaterial(keySelectedMaterial);
+        ChangeDisplayedMaterial(keyPressedMaterial);
     }
 
     //click & holdclick
