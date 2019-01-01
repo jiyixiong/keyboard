@@ -35,7 +35,7 @@ public class RightKeyboard : KeyboardComponent
 
     public void SetKeys(KeyboardItem[] keys)
     {
-        Debug.Log("Status Creat");
+        Debug.Log("Right Status Creat");
         this.keys = keys;
     }
 

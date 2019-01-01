@@ -36,7 +36,7 @@ public class Creator : KeyboardComponent
     //Methods
     void Awake()
     {
-		Debug.Log("creator");
+		Debug.Log("creator init ");
         InitKeys();
         ChangeMaterialOnKeys();
         ManageKeys();
@@ -84,7 +84,7 @@ public class Creator : KeyboardComponent
 
     private void FillAndPlaceKeys()
     {
-		Debug.Log("set keys");
+		//Debug.Log("set keys");
 		foreach(KeyboardItem lkey in leftkeys)
 			lkey.SetKeyText(0);
 		foreach(KeyboardItem rkey in rightkeys)
