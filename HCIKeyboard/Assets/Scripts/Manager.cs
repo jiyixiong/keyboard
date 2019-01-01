@@ -24,7 +24,10 @@ public class Manager : MonoBehaviour
     private RightKeyboard rightKeyboardstatus;
 
     [SerializeField] private TextMesh inputText;
+    [SerializeField] private TextMesh hintsText; 
 
+    private string red_left = "<color=#ff0000>";
+    private string red_right = "</color>";
 
     public static bool Gesture_left = false;
     public static bool Gesture_right = false;
@@ -32,6 +35,9 @@ public class Manager : MonoBehaviour
     public static bool Gesture_down = false;
     public static bool Gesture_zoom = false;
     public static float movePOs = 0.0f;
+
+    private string query_string = "";
+    private bool only_right = true;
 
     [SerializeField] private LeapProvider mProvider;
     private Frame mFrame;
@@ -61,7 +67,11 @@ public class Manager : MonoBehaviour
         mapper = GetComponent<PositionMapper>();
         mProvider = FindObjectOfType<LeapProvider>() as LeapProvider;
         inputText = GameObject.Find("input").GetComponent<TextMesh>();
+        hintsText = GameObject.Find("hints").GetComponent<TextMesh>();
+        hintsText.text = red_left + "aaa" + red_right;
         inputText.text = "";
+        query_string = "";
+        only_right = true;
         Debug.Log("manager");
         /*TextAsset txtAsset = (TextAsset)Resources.Load("phrases", typeof(TextAsset));
 
@@ -80,6 +90,7 @@ public class Manager : MonoBehaviour
 
     void Update()
     {
+        checkOnlyRight();
         cleanText();
         listenleftdown();
         listenrightdown();
@@ -128,12 +139,19 @@ public class Manager : MonoBehaviour
         }
         return (count == 5);
     }
+
+    void checkOnlyRight()
+    {
+        if (true)//check gesture
+            only_right = true;
+    }
+
     void listenleftdown()
     {
         if (mapper.LeftCursorDown)
         {
             string letter = leftKeyboardstatus.getClick();
-            if (!letter.Equals(""))
+            if (!letter.Equals("") && !only_right)
             {
                 addInputText(letter);
             }
@@ -150,6 +168,10 @@ public class Manager : MonoBehaviour
             if (btn != -1)
                 {
                     Debug.Log(btn);
+                    query_string += btn.ToString();
+                    Debug.Log(query_string);
+                    //get results
+                    //set hints
                     leftKeyboardstatus.setBtn(btn);
                 }
 
@@ -166,4 +188,7 @@ public class Manager : MonoBehaviour
     { //删除一个字符
         inputText.text = inputText.text.Remove(inputText.text.Length - 1);
     }
+
+    //public void sethints()
+
 }
