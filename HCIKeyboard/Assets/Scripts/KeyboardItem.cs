@@ -75,6 +75,10 @@ public class KeyboardItem : KeyboardComponent
         clicked = true;
         ChangeDisplayedMaterial(keyPressedMaterial);
     }
+    public void unHold()
+    {
+        ChangeDisplayedMaterial(keyNormalMaterial);
+    }
 
     //delete or not?
     private void HoldClick()//keep pressing
@@ -129,7 +133,7 @@ public class KeyboardItem : KeyboardComponent
             value = rightLetters[position];
             letter.fontSize = 4;
         }
-        Debug.Log(value);
+        //Debug.Log(value);
         if (!letter.text.Equals(value))
         {
             letter.text = value;
@@ -153,7 +157,7 @@ public class KeyboardItem : KeyboardComponent
     {
 
         string cursorname = other.gameObject.name;
-        Debug.Log(cursorname);
+        //Debug.Log(cursorname);
         
         if(cursorname.Equals("LeftCursor")&&this.isLeft)
             {
@@ -173,7 +177,7 @@ public class KeyboardItem : KeyboardComponent
     {
 
         string cursorname = other.gameObject.name;
-        Debug.Log(cursorname);
+        //Debug.Log(cursorname);
        
         if(cursorname.Equals("LeftCursor")&&this.isLeft)
             {
@@ -191,7 +195,7 @@ public class KeyboardItem : KeyboardComponent
     }
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("get");
+        //Debug.Log("get");
     }
 }
 

@@ -30,8 +30,13 @@ public class Manager : MonoBehaviour
     private NumToStrList translator;
     private List<string> results;
 
+
+    private int cur_pos;
     private bool cursor_down;
     private bool select_down;
+    private bool backsapce;
+    private bool left_slide;
+    private bool right_slide;
 
 
     private string query_string = "";
@@ -93,6 +98,7 @@ public class Manager : MonoBehaviour
 
         if(only_right)
         {
+            listenCursor();
             listenCursordown();
             listenSelectdown();
             listenBack();
@@ -121,6 +127,11 @@ public class Manager : MonoBehaviour
 
         cursor_down = false;
         select_down = false;
+        backsapce = false;
+        left_slide = false;
+        right_slide = false;
+
+        cur_pos = -1;
 
         Debug.Log("manager init");
     }
@@ -131,6 +142,15 @@ public class Manager : MonoBehaviour
             only_right = true;
     }
 
+    void listenCursor()
+    {
+        int now_pos = mapper.CursorPosition();
+        if(now_pos != cur_pos)
+        {
+            rightKeyboardstatus.cancelHold(cur_pos);
+            rightKeyboardstatus.setHold(cur_pos);
+        }
+    }
     void listenCursordown()
     {
         if(mapper.CursonDown()&& !cursor_down)
@@ -207,10 +227,13 @@ public class Manager : MonoBehaviour
 
     void listenBack()
     {
-        if(mapper.BackSpaceDown())
+        if(mapper.BackSpaceDown()&& !backsapce)
         {
+            backsapce = true;
             delInputText();
         }
+        else
+            backsapce = false;
     }
 
     void listenSelectGestrue()
@@ -227,7 +250,7 @@ public class Manager : MonoBehaviour
     }
     void listenGesture()
     {
-        if(mapper.SelectLeft()&&results.Count==5)
+        if(mapper.SelectLeft()&&results.Count==5&&!left_slide)
         {
             level++;
             List<string> cur_results = translator.getStrList(query_string,level);//query
@@ -236,16 +259,25 @@ public class Manager : MonoBehaviour
             else
                 level--;
             setHints(1);
+            left_slide = true;
+            right_slide = false;
             
         }
-        else if(mapper.SelectRight()&&level>0)
+        else if(mapper.SelectRight()&&level>0&&!right_slide)
         {
             level--;
             this.results = translator.getStrList(query_string,level);//query
             setHints(1);
+
+            left_slide = false;
+            right_slide = true;
         }
-        else    
+        else
+        {  
+            left_slide = false;  
+            right_slide = false;
             return;
+        }
     }
     public void addInputText(String inputString)
     { //输入框加入字符

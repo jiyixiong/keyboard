@@ -35,7 +35,7 @@ public class RightKeyboard : KeyboardComponent
 
     public void SetKeys(KeyboardItem[] keys)
     {
-        Debug.Log("Status Creat");
+        Debug.Log("Right Status Creat");
         this.keys = keys;
     }
 
@@ -75,6 +75,17 @@ public class RightKeyboard : KeyboardComponent
         {
             keys[i].clicked = false;
         }
+    }
+
+    public void setHold(int pos)
+    {
+        if(pos>0)
+            this.keys[pos-1].GetHolding();
+    }
+    public void cancelHold(int pos)
+    {
+        if(pos>0)
+            this.keys[pos-1].unHold();
     }
     //Change keyboard
     private void ChangeSpecialLetters()
