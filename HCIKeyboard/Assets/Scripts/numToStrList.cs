@@ -27,11 +27,10 @@ class Node
 		child = new Dictionary<int, Node>();
 	}
 }
+
 class NumToStrList {
 	private Node wordTree;
-	// private Node wordTree;
 	private Hashtable charToNum;
-	private Hashtable cache;
 	private string cacheNumStr;
 	private List<Node> cachePtr;
 	private List<WordNode> cacheWords;
@@ -70,70 +69,57 @@ class NumToStrList {
 
     public NumToStrList () {
 		initTransform();
-		cache = new Hashtable();
-		cache.Add("ptr", new ArrayList());
-		cache.Add("numStr", "");
-		cache.Add("cache", new ArrayList());
+		cachePtr = new List<Node>();
+		cacheWords = new List<WordNode>();
+		wordTree = new Node();
+
 		StreamReader sr = new StreamReader("lexicon.txt", Encoding.Default);
 		string line;
 		while((line = sr.ReadLine()) != null) {
-			Hashtable curNode = wordTree;
+			Node curNode = wordTree;
 			string[] tmp = line.toString().Split(' ');
 			foreach(char cha in tmp[0]) {
 				string num = charToNum[cha];
-				if(!curNode.ContainsKey(num)) {
-					Hashtable newNode = new Hashtable();
-					curNode.Add(num, newNode);
+				if(!curNode.child.ContainsKey(num)) {
+					Node newNode = new Node();
+					curNode.child.Add(num, newNode);
 				}
-				curNode = curNode[num];
+				curNode = curNode.child[num];
 			}
-			if(!curNode.ContainsKey("words")) {
-				
-				List<WordNode> words = new List<WordNode>();
-
-				curNode.Add("words", words);
+			if(curNode.words == null) {
+				curNode.words = new List<WordNode>();
 			}
-			((List<WordNode>)curNode["words"]).Add(new WordNode(tmp[0], int.Parse(tmp[1])));
+			curNode.words.Add(new WordNode(tmp[0], int.Parse(tmp[1])));
 		}
 	}
 
 	private void updateCacheBySearchDeeper() {
-		Hashtable curDeepTable = new Hashtable();
 		ArrayList curDeepList = new ArrayList();
-		cache["ptr"].clear();
-		ArrayList newPtrList = cache["ptr"];
+		List<Node> newPtrList = new List<Node>();
 
-		foreach (Hashtable parentNode in cache["ptr"]) {
-			foreach(string key in parentNode) {
-				if(key != "words") {
-					Hashtable node = parentNode[key];
-					newPtrList.Add(node);
-					if(node.ContainsKey("words")) {
-						foreach (DictionaryEntry de in node["words"]) {
-							curDeepTable.Add(de.Key.toString(), de.Value);
-						}
+		foreach (Node parentNode in cachePtr) {
+			foreach(string key in parentNode.child.Keys) {
+				Node node = parentNode.child[key];
+				newPtrList.Add(node);
+				if(node.words != null) {
+					foreach (WordNode wordNode in node.words) {
+						curDeepList.Add(wordNode);
 					}
 				}
 			}
 		}
 
-		List<Map.Entry<String,int>> list = new ArrayList<Map.Entry<String,int>>(curDeepTable.entrySet());
-		// Collections.sort(list, new Comparator<Map.Entry<String,String>>() {
-    	// 	//升序排序
-    	// 	int compare(Entry<String, String> o1, Entry<String, String> o2) {
-        // 		return o1.getValue().compareTo(o2.getValue());
-    	// 	}    
-		// });
-		foreach(Map.Entry<String,int> mapping in list) { 
-			cache["cache"].Add(mapping.getValue());
+		cachePtr = newPtrList;
+		foreach(WordNode wordNode in curDeepList) { 
+			cacheWords.Add(wordNode.words);
 		}
 	}
 
 	private string[] getFromCache(string numStr, int level = 0) {
-		if (numStr == cache["numStr"]) {
-			if(cache["cache"].Count > 5*level+4) {
+		if (numStr == cacheNumStr) {
+			if(cacheWords.Count > 5*level+4) {
 				return ;
-			} else if(cache["ptr"].Count > 0) {
+			} else if(cachePtr.Count > 0) {
 				updateCacheBySearchDeeper();
 				return getFromCache(numStr, level);
 			} else {
@@ -148,40 +134,28 @@ class NumToStrList {
 		if (level > 0) {
 			return getFromCache(numStr, level);
 		} else if (level == 0) {
-			// cache初始化
-			// cache.Add("ptr", new Vector<Hashtable>());
-			// cache.Add("numStr", numStr);
-			// cache.Add("results", new ArrayList());
-			cache["ptr"].clear();
-			cache["numStr"] = numStr;
-			cache["cache"].clear();
+			cachePtr.clear();
+			cacheNumStr = numStr;
+			cacheWords.clear();
 
-			Hashtable curNode = wordTree;
+			Node curNode = wordTree;
 			foreach (char num in numStr) {
-				if (curNode.ContainsKey(num)) {
-					curNode = curNode[num];
+				if (curNode.child.ContainsKey(num)) {
+					curNode = curNode.child[num];
 				} else {
 					return nullStrList;
 				}
 			}
 
-			if (curNode.ContainsKey("words")) {
-				Hashtable wordsTable = curNode["words"];
-				List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(wordsTable.entrySet());
-				// Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
-				//         //升序排序
-				// public int compare(Entry<String, String> o1, Entry<String, String> o2) {
-				//     return o1.getValue().compareTo(o2.getValue());
-				//     }
-				// });
-		
-				for(Map.Entry<String,String> mapping:list){ 
-					cache["cache"].Add(mapping.getValue());
+			if (curNode.words != null) {
+				List<WordNode> wordsList = curNode.words;
+				for(WordNode wordNode : wordList){ 
+					cacheWords.Add(wordNode.word);
 				}
-				cache["ptr"].Add(curNode);
+				cachePtr.Add(curNode);
 				return getFromCache(numStr);
 			} else {
-				cache["ptr"].Add(curNode);
+				cachePtr.Add(curNode);
 				return getFromCache(numStr);
 			}
 		}
