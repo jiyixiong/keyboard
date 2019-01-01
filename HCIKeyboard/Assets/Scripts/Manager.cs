@@ -11,24 +11,27 @@ using Leap.Unity;
 public class Manager : MonoBehaviour
 {
     [SerializeField] private Text input;//User input
-    [SerializeField] private Text instruction;//Instructions
 
-    //private List<string> words;//pool of instructions
-    private string[] words;
-    [SerializeField] private int index;//instruction index
-
+    //Keyboard
     [SerializeField] private GameObject leftkeyboard;
     [SerializeField] private GameObject rightkeyboard;
     //private KeyboardStatus keyboardstatus;
     private LeftKeyboard leftKeyboardstatus;
     private RightKeyboard rightKeyboardstatus;
 
+    //Input box
     [SerializeField] private TextMesh inputText;
     [SerializeField] private TextMesh hintsText; 
 
+    //const color
     private string red_left = "<color=#ff0000>";
     private string red_right = "</color>";
 
+    private NumToStrList translator;
+    private List<string> results;
+
+
+    //test
     public static bool Gesture_left = false;
     public static bool Gesture_right = false;
     public static bool Gesture_up = false;
@@ -57,22 +60,11 @@ public class Manager : MonoBehaviour
 
     [SerializeField] private PositionMapper mapper;
 
+   
     //Methods
     void Start()
     {
-
-
-        leftKeyboardstatus = leftkeyboard.GetComponent<LeftKeyboard>();//get status
-        rightKeyboardstatus = rightkeyboard.GetComponent<RightKeyboard>();//get status
-        mapper = GetComponent<PositionMapper>();
-        mProvider = FindObjectOfType<LeapProvider>() as LeapProvider;
-        inputText = GameObject.Find("input").GetComponent<TextMesh>();
-        hintsText = GameObject.Find("hints").GetComponent<TextMesh>();
-        hintsText.text = red_left + "aaa" + red_right;
-        inputText.text = "";
-        query_string = "";
-        only_right = true;
-        Debug.Log("manager");
+        initKeyboard();
         /*TextAsset txtAsset = (TextAsset)Resources.Load("phrases", typeof(TextAsset));
 
         words = txtAsset.text.Split('\n');
@@ -90,12 +82,152 @@ public class Manager : MonoBehaviour
 
     void Update()
     {
-        checkOnlyRight();
-        cleanText();
-        listenleftdown();
-        listenrightdown();
+        //checkOnlyRight();
+        //cleanText();
+        listenCursordown();
+        listenSelectdown();
+        listenBack();
+        listenSelectGestrue();
+        listenGesture();
     }
-    void cleanText()
+
+     void initKeyboard()
+    {
+        leftKeyboardstatus = leftkeyboard.GetComponent<LeftKeyboard>();//get status
+        rightKeyboardstatus = rightkeyboard.GetComponent<RightKeyboard>();//get status
+        mapper = GetComponent<PositionMapper>();//get listener
+        //mProvider = FindObjectOfType<LeapProvider>() as LeapProvider;
+        inputText = GameObject.Find("input").GetComponent<TextMesh>();
+        inputText.text = "";
+        hintsText = GameObject.Find("hints").GetComponent<TextMesh>();
+        hintsText.text = "";
+        
+        query_string = "";
+        results = new List<string>();
+        translator = new NumToStrList();
+
+        only_right = true;
+        Debug.Log("manager init");
+    }
+
+    void checkOnlyRight()
+    {
+        if (true)//check gesture
+            only_right = true;
+    }
+
+    void listenCursordown()
+    {
+        if(mapper.CursonDown())
+        {
+            int pos = mapper.CursorPosition();
+            query_string += pos.ToString();
+            this.results = translator.query(query_string);//query
+            setHints(1);
+        }
+        // if (mapper.LeftCursorDown)
+        // {
+        //     string letter = leftKeyboardstatus.getClick();
+        //     if (!letter.Equals("") && !only_right)
+        //     {
+        //         addInputText(letter);
+        //     }
+
+        // }
+        // else
+        //     leftKeyboardstatus.cancelClick();
+    }
+    void listenSelectdown()
+    {
+        
+        //
+        // if (mapper.RightCursorDown)
+        // {
+        //     int btn = rightKeyboardstatus.getClick();
+        //     if (btn != -1)
+        //         {
+        //             Debug.Log(btn);
+        //             query_string += btn.ToString();
+        //             Debug.Log(query_string);
+        //             //get results
+        //             //set hints
+        //             leftKeyboardstatus.setBtn(btn);
+        //         }
+
+        // }
+        // else
+        //     rightKeyboardstatus.cancelClick();
+    }
+
+    void listenBack()
+    {
+        if(mapper.BackSpaceDown())
+        {
+            
+
+        }
+    }
+
+    void listenSelectGestrue()
+    {
+
+    }
+    void listenGesture()
+    {
+
+    }
+    public void addInputText(String inputString)
+    { //输入框加入字符
+        inputText.text = inputText.text + inputString;
+    }
+
+    public void delInputText()
+    { //删除一个字符
+        inputText.text = inputText.text.Remove(inputText.text.Length - 1);
+    }
+
+    void setHints(int index)
+    {
+        string hints = "";
+        for(int i=0; i<this.results.Count; i++)
+        {
+            if(i==index-1)
+            { 
+                hints += red_left;
+                hints += results[i];
+                hints += red_right;
+                hints += "  ";
+            }
+            else
+            {
+                hints += results[i];
+                hints += "  ";
+            }
+        }
+        hintsText.text = red_left + "aaa" + red_right;
+    }
+
+
+
+
+    protected bool isCloseHand(Hand hand)     //是否握拳 
+    {
+        List<Finger> listOfFingers = hand.Fingers;
+        int count = 0;
+        for (int f = 0; f < listOfFingers.Count; f++)
+        { //循环遍历所有的手~~
+            Finger finger = listOfFingers[f];
+            if ((finger.TipPosition - hand.PalmPosition).Magnitude < 0.06f)    // Magnitude  向量的长度 。是(x*x+y*y+z*z)的平方根。
+                                                                               //float deltaCloseFinger = 0.05f;
+            {
+                count++;
+                //if (finger.Type == Finger.FingerType.TYPE_THUMB)
+                //Debug.Log ((finger.TipPosition - hand.PalmPosition).Magnitude);
+            }
+        }
+        return (count == 5);
+    }
+       void cleanText()
     {
 		  mFrame = mProvider.CurrentFrame;
         //判断是否为握拳状态
@@ -118,77 +250,6 @@ public class Manager : MonoBehaviour
 		if(myBool)
 
                     delInputText();
-      
-
-
     }
-    protected bool isCloseHand(Hand hand)     //是否握拳 
-    {
-        List<Finger> listOfFingers = hand.Fingers;
-        int count = 0;
-        for (int f = 0; f < listOfFingers.Count; f++)
-        { //循环遍历所有的手~~
-            Finger finger = listOfFingers[f];
-            if ((finger.TipPosition - hand.PalmPosition).Magnitude < 0.06f)    // Magnitude  向量的长度 。是(x*x+y*y+z*z)的平方根。
-                                                                               //float deltaCloseFinger = 0.05f;
-            {
-                count++;
-                //if (finger.Type == Finger.FingerType.TYPE_THUMB)
-                //Debug.Log ((finger.TipPosition - hand.PalmPosition).Magnitude);
-            }
-        }
-        return (count == 5);
-    }
-
-    void checkOnlyRight()
-    {
-        if (true)//check gesture
-            only_right = true;
-    }
-
-    void listenleftdown()
-    {
-        if (mapper.LeftCursorDown)
-        {
-            string letter = leftKeyboardstatus.getClick();
-            if (!letter.Equals("") && !only_right)
-            {
-                addInputText(letter);
-            }
-
-        }
-        else
-            leftKeyboardstatus.cancelClick();
-    }
-    void listenrightdown()
-    {
-        if (mapper.RightCursorDown)
-        {
-            int btn = rightKeyboardstatus.getClick();
-            if (btn != -1)
-                {
-                    Debug.Log(btn);
-                    query_string += btn.ToString();
-                    Debug.Log(query_string);
-                    //get results
-                    //set hints
-                    leftKeyboardstatus.setBtn(btn);
-                }
-
-        }
-        else
-            rightKeyboardstatus.cancelClick();
-    }
-    public void addInputText(String inputString)
-    { //输入框加入字符
-        inputText.text = inputText.text + inputString;
-    }
-
-    public void delInputText()
-    { //删除一个字符
-        inputText.text = inputText.text.Remove(inputText.text.Length - 1);
-    }
-
-    //public void sethints()
 
 }

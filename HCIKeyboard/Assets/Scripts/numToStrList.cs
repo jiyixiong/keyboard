@@ -6,8 +6,8 @@ using System.Collections.Generic;
 
 
 class WordNode{
-	string word;
-	int count;
+	public string word;
+	public int count;
 
 	public WordNode(string w, int c)
 	{
@@ -19,12 +19,12 @@ class WordNode{
 class Node
 {
 	public List<WordNode> words;
-	public Dictionary<int, Node> child;
+	public Dictionary<string, Node> child;
 
 	public Node()
 	{
 		words = new List<WordNode>();
-		child = new Dictionary<int, Node>();
+		child = new Dictionary<string, Node>();
 	}
 }
 
@@ -33,9 +33,9 @@ class NumToStrList {
 	private Hashtable charToNum;
 	private string cacheNumStr;
 	private List<Node> cachePtr;
-	private List<WordNode> cacheWords;
+	private List<string> cacheWords;
 
-	private string[] nullStrList = {"", "", "", "", ""};
+	private List<string> nullStrList = new List<string> {"", "", "", "", ""};
 
     private void initTransform() {
         charToNum = new Hashtable();
@@ -70,16 +70,16 @@ class NumToStrList {
     public NumToStrList () {
 		initTransform();
 		cachePtr = new List<Node>();
-		cacheWords = new List<WordNode>();
+		cacheWords = new List<string>();
 		wordTree = new Node();
 
 		StreamReader sr = new StreamReader("lexicon.txt", Encoding.Default);
 		string line;
 		while((line = sr.ReadLine()) != null) {
 			Node curNode = wordTree;
-			string[] tmp = line.toString().Split(' ');
+			string[] tmp = line.Split(' ');
 			foreach(char cha in tmp[0]) {
-				string num = charToNum[cha];
+				string num = charToNum[cha].ToString();
 				if(!curNode.child.ContainsKey(num)) {
 					Node newNode = new Node();
 					curNode.child.Add(num, newNode);
@@ -111,37 +111,42 @@ class NumToStrList {
 
 		cachePtr = newPtrList;
 		foreach(WordNode wordNode in curDeepList) { 
-			cacheWords.Add(wordNode.words);
+			cacheWords.Add(wordNode.word);
 		}
 	}
 
-	private string[] getFromCache(string numStr, int level = 0) {
+	private List<string> getFromCache(string numStr, int level = 0) {
+		List<string> results = new List<string>();
 		if (numStr == cacheNumStr) {
 			if(cacheWords.Count > 5*level+4) {
-				return ;
+				for(int i= 0; i<5; i++)
+					results.Add(cacheWords[5*level+i]);
+				return results;
 			} else if(cachePtr.Count > 0) {
 				updateCacheBySearchDeeper();
 				return getFromCache(numStr, level);
 			} else {
-				return ;
+				for(int i= 5*level; i<cacheWords.Count; i++)
+					results.Add(cacheWords[i]);
+				return results;
 			}
 		} else {
 			return getStrList(numStr, level);
 		}
 	}
 
-	public string[] getStrList(string numStr, int level = 0) {
+	public List<string> getStrList(string numStr, int level = 0) {
 		if (level > 0) {
 			return getFromCache(numStr, level);
 		} else if (level == 0) {
-			cachePtr.clear();
+			cachePtr.Clear();
 			cacheNumStr = numStr;
-			cacheWords.clear();
+			cacheWords.Clear();
 
 			Node curNode = wordTree;
 			foreach (char num in numStr) {
-				if (curNode.child.ContainsKey(num)) {
-					curNode = curNode.child[num];
+				if (curNode.child.ContainsKey(num.ToString())) {
+					curNode = curNode.child[num.ToString()];
 				} else {
 					return nullStrList;
 				}
@@ -149,7 +154,7 @@ class NumToStrList {
 
 			if (curNode.words != null) {
 				List<WordNode> wordsList = curNode.words;
-				for(WordNode wordNode : wordList){ 
+				foreach(WordNode wordNode in wordsList){ 
 					cacheWords.Add(wordNode.word);
 				}
 				cachePtr.Add(curNode);
@@ -159,6 +164,7 @@ class NumToStrList {
 				return getFromCache(numStr);
 			}
 		}
+		return nullStrList;
 	}
 	
 }
