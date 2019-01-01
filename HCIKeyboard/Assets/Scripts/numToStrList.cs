@@ -35,7 +35,7 @@ class NumToStrList {
 	private List<Node> cachePtr;
 	private List<string> cacheWords;
 
-	private List<string> nullStrList = new List<string> {"", "", "", "", ""};
+	private List<string> nullStrList ;
 
     private void initTransform() {
         charToNum = new Hashtable();
@@ -71,6 +71,7 @@ class NumToStrList {
 		initTransform();
 		cachePtr = new List<Node>();
 		cacheWords = new List<string>();
+		nullStrList = new List<string>();
 		wordTree = new Node();
 
 		StreamReader sr = new StreamReader("lexicon.txt", Encoding.Default);
@@ -79,7 +80,7 @@ class NumToStrList {
 			Node curNode = wordTree;
 			string[] tmp = line.Split(' ');
 			foreach(char cha in tmp[0]) {
-				string num = charToNum[cha].ToString();
+				string num = charToNum[cha.ToString()].ToString();
 				if(!curNode.child.ContainsKey(num)) {
 					Node newNode = new Node();
 					curNode.child.Add(num, newNode);
