@@ -68,7 +68,8 @@ public class Manager : MonoBehaviour
     public float deltaVelocity = 1.0f;//单方向上手掌移动的速度
 
 
-    [SerializeField] private PositionMapper mapper;
+    //[SerializeField] private PositionMapper mapper;
+    [SerializeField] private LeapMotionController controller;
 
    
     //Methods
@@ -111,7 +112,7 @@ public class Manager : MonoBehaviour
     {
         leftKeyboardstatus = leftkeyboard.GetComponent<LeftKeyboard>();//get status
         rightKeyboardstatus = rightkeyboard.GetComponent<RightKeyboard>();//get status
-        mapper = GetComponent<PositionMapper>();//get listener
+        controller = GetComponent<LeapMotionController>();//get listener
         //mProvider = FindObjectOfType<LeapProvider>() as LeapProvider;
         inputText = GameObject.Find("input").GetComponent<TextMesh>();
         inputText.text = "";
@@ -144,7 +145,7 @@ public class Manager : MonoBehaviour
 
     void listenCursor()
     {
-        int now_pos = mapper.CursorPosition();
+        int now_pos = controller.CursorPosition;
         if(now_pos != cur_pos)
         {
             rightKeyboardstatus.cancelHold(cur_pos);
@@ -153,10 +154,10 @@ public class Manager : MonoBehaviour
     }
     void listenCursordown()
     {
-        if(mapper.CursonDown()&& !cursor_down)
+        if(controller.CursorDown && !cursor_down)
         {
             this.level = 0;
-            int pos = mapper.CursorPosition();
+            int pos = controller.CursorPosition;
             query_string += pos.ToString();
             this.results = translator.getStrList(query_string,level);//query
             setHints(1);
@@ -166,7 +167,7 @@ public class Manager : MonoBehaviour
             cursor_down =false;
 
         //old version
-        // if (mapper.LeftCursorDown)
+        // if (controller.LeftCursorDown)
         // {
         //     string letter = leftKeyboardstatus.getClick();
         //     if (!letter.Equals("") && !only_right)
@@ -180,9 +181,9 @@ public class Manager : MonoBehaviour
     }
     void listenSelectdown()
     {
-        if(mapper.SelectDown() && !select_down)
+        if(controller.SelectDown && !select_down)
         {
-            int finger = mapper.SelectPosition();
+            int finger = controller.SelectPosition;
             if(finger == 0)
             {
                 addInputText(" ");
@@ -207,7 +208,7 @@ public class Manager : MonoBehaviour
         else
             select_down = false;
         //
-        // if (mapper.RightCursorDown)
+        // if (controller.RightCursorDown)
         // {
         //     int btn = rightKeyboardstatus.getClick();
         //     if (btn != -1)
@@ -227,7 +228,7 @@ public class Manager : MonoBehaviour
 
     void listenBack()
     {
-        if(mapper.BackSpaceDown()&& !backsapce)
+        if(controller.BackSpaceDown&& !backsapce)
         {
             backsapce = true;
             delInputText();
@@ -238,7 +239,7 @@ public class Manager : MonoBehaviour
 
     void listenSelectGestrue()
     {
-        int index = mapper.SelectPosition();
+        int index = controller.SelectPosition;
         if(index==0 || index >= results.Count)
         {
             setHints(1);
@@ -250,7 +251,7 @@ public class Manager : MonoBehaviour
     }
     void listenGesture()
     {
-        if(mapper.SelectLeft()&&results.Count==5&&!left_slide)
+        if(controller.SelectLeft&&results.Count==5&&!left_slide)
         {
             level++;
             List<string> cur_results = translator.getStrList(query_string,level);//query
@@ -263,7 +264,7 @@ public class Manager : MonoBehaviour
             right_slide = false;
             
         }
-        else if(mapper.SelectRight()&&level>0&&!right_slide)
+        else if(controller.SelectRight&&level>0&&!right_slide)
         {
             level--;
             this.results = translator.getStrList(query_string,level);//query
