@@ -30,6 +30,8 @@ public class Manager : MonoBehaviour
     private NumToStrList translator;
     private List<string> results;
 
+
+    private int cur_pos;
     private bool cursor_down;
     private bool select_down;
     private bool backsapce;
@@ -96,6 +98,7 @@ public class Manager : MonoBehaviour
 
         if(only_right)
         {
+            listenCursor();
             listenCursordown();
             listenSelectdown();
             listenBack();
@@ -128,6 +131,8 @@ public class Manager : MonoBehaviour
         left_slide = false;
         right_slide = false;
 
+        cur_pos = -1;
+
         Debug.Log("manager init");
     }
 
@@ -137,6 +142,15 @@ public class Manager : MonoBehaviour
             only_right = true;
     }
 
+    void listenCursor()
+    {
+        int now_pos = mapper.CursorPosition();
+        if(now_pos != cur_pos)
+        {
+            rightKeyboardstatus.cancelHold(cur_pos);
+            rightKeyboardstatus.setHold(cur_pos);
+        }
+    }
     void listenCursordown()
     {
         if(mapper.CursonDown()&& !cursor_down)

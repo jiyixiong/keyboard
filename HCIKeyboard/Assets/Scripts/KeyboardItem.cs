@@ -75,6 +75,10 @@ public class KeyboardItem : KeyboardComponent
         clicked = true;
         ChangeDisplayedMaterial(keyPressedMaterial);
     }
+    public void unHold()
+    {
+        ChangeDisplayedMaterial(keyNormalMaterial);
+    }
 
     //delete or not?
     private void HoldClick()//keep pressing
