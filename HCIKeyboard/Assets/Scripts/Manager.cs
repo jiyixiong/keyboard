@@ -11,27 +11,41 @@ using Leap.Unity;
 public class Manager : MonoBehaviour
 {
     [SerializeField] private Text input;//User input
-    [SerializeField] private Text instruction;//Instructions
 
-    //private List<string> words;//pool of instructions
-    private string[] words;
-    [SerializeField] private int index;//instruction index
-
+    //Keyboard
     [SerializeField] private GameObject leftkeyboard;
     [SerializeField] private GameObject rightkeyboard;
     //private KeyboardStatus keyboardstatus;
     private LeftKeyboard leftKeyboardstatus;
     private RightKeyboard rightKeyboardstatus;
 
+    //Input box
     [SerializeField] private TextMesh inputText;
+    [SerializeField] private TextMesh hintsText; 
+
+    //const color
+    private string red_left = "<color=#ff0000>";
+    private string red_right = "</color>";
+
+    private NumToStrList translator;
+    private List<string> results;
+
+    private bool cursor_down;
+    private bool select_down;
 
 
+    private string query_string = "";
+    private int level;
+    private bool only_right = true;
+
+    //test
     public static bool Gesture_left = false;
     public static bool Gesture_right = false;
     public static bool Gesture_up = false;
     public static bool Gesture_down = false;
     public static bool Gesture_zoom = false;
     public static float movePOs = 0.0f;
+
 
     [SerializeField] private LeapProvider mProvider;
     private Frame mFrame;
@@ -51,18 +65,12 @@ public class Manager : MonoBehaviour
 
     [SerializeField] private PositionMapper mapper;
 
+   
     //Methods
     void Start()
     {
-
-
-        leftKeyboardstatus = leftkeyboard.GetComponent<LeftKeyboard>();//get status
-        rightKeyboardstatus = rightkeyboard.GetComponent<RightKeyboard>();//get status
-        mapper = GetComponent<PositionMapper>();
-        mProvider = FindObjectOfType<LeapProvider>() as LeapProvider;
-        inputText = GameObject.Find("input").GetComponent<TextMesh>();
-        inputText.text = "";
-        Debug.Log("manager");
+        initKeyboard();
+        //listenCursordown();
         /*TextAsset txtAsset = (TextAsset)Resources.Load("phrases", typeof(TextAsset));
 
         words = txtAsset.text.Split('\n');
@@ -80,11 +88,217 @@ public class Manager : MonoBehaviour
 
     void Update()
     {
-        cleanText();
-        listenleftdown();
-        listenrightdown();
+        //checkOnlyRight();
+        //cleanText();
+
+        if(only_right)
+        {
+            listenCursordown();
+            listenSelectdown();
+            listenBack();
+            listenSelectGestrue();
+            listenGesture();
+        }
     }
-    void cleanText()
+
+     void initKeyboard()
+    {
+        leftKeyboardstatus = leftkeyboard.GetComponent<LeftKeyboard>();//get status
+        rightKeyboardstatus = rightkeyboard.GetComponent<RightKeyboard>();//get status
+        mapper = GetComponent<PositionMapper>();//get listener
+        //mProvider = FindObjectOfType<LeapProvider>() as LeapProvider;
+        inputText = GameObject.Find("input").GetComponent<TextMesh>();
+        inputText.text = "";
+        hintsText = GameObject.Find("hints").GetComponent<TextMesh>();
+        hintsText.text = "";
+        
+        query_string = "";
+        level = 0;
+        results = new List<string>();
+        translator = new NumToStrList();
+
+        only_right = true;
+
+        cursor_down = false;
+        select_down = false;
+
+        Debug.Log("manager init");
+    }
+
+    void checkOnlyRight()
+    {
+        if (true)//check gesture
+            only_right = true;
+    }
+
+    void listenCursordown()
+    {
+        if(mapper.CursonDown()&& !cursor_down)
+        {
+            this.level = 0;
+            int pos = mapper.CursorPosition();
+            query_string += pos.ToString();
+            this.results = translator.getStrList(query_string,level);//query
+            setHints(1);
+            cursor_down = true;
+        }
+        else
+            cursor_down =false;
+
+        //old version
+        // if (mapper.LeftCursorDown)
+        // {
+        //     string letter = leftKeyboardstatus.getClick();
+        //     if (!letter.Equals("") && !only_right)
+        //     {
+        //         addInputText(letter);
+        //     }
+
+        // }
+        // else
+        //     leftKeyboardstatus.cancelClick();
+    }
+    void listenSelectdown()
+    {
+        if(mapper.SelectDown() && !select_down)
+        {
+            int finger = mapper.SelectPosition();
+            if(finger == 0)
+            {
+                addInputText(" ");
+                select_down = true;
+            }
+            else if(finger < results.Count)
+            {
+                addInputText(results[finger]);
+                query_string = "";
+                level = 0;
+                results.Clear();
+                setHints(1);
+                select_down = true;
+            }
+            else
+            {
+                select_down = true;
+                return;
+            }
+
+        }
+        else
+            select_down = false;
+        //
+        // if (mapper.RightCursorDown)
+        // {
+        //     int btn = rightKeyboardstatus.getClick();
+        //     if (btn != -1)
+        //         {
+        //             Debug.Log(btn);
+        //             query_string += btn.ToString();
+        //             Debug.Log(query_string);
+        //             //get results
+        //             //set hints
+        //             leftKeyboardstatus.setBtn(btn);
+        //         }
+
+        // }
+        // else
+        //     rightKeyboardstatus.cancelClick();
+    }
+
+    void listenBack()
+    {
+        if(mapper.BackSpaceDown())
+        {
+            delInputText();
+        }
+    }
+
+    void listenSelectGestrue()
+    {
+        int index = mapper.SelectPosition();
+        if(index==0 || index >= results.Count)
+        {
+            setHints(1);
+        }
+        else
+        {
+            setHints(index);
+        }
+    }
+    void listenGesture()
+    {
+        if(mapper.SelectLeft()&&results.Count==5)
+        {
+            level++;
+            List<string> cur_results = translator.getStrList(query_string,level);//query
+            if(cur_results.Count > 0)
+                this.results = cur_results;
+            else
+                level--;
+            setHints(1);
+            
+        }
+        else if(mapper.SelectRight()&&level>0)
+        {
+            level--;
+            this.results = translator.getStrList(query_string,level);//query
+            setHints(1);
+        }
+        else    
+            return;
+    }
+    public void addInputText(String inputString)
+    { //输入框加入字符
+        inputText.text = inputText.text + inputString;
+    }
+
+    public void delInputText()
+    { //删除一个字符
+        inputText.text = inputText.text.Remove(inputText.text.Length - 1);
+    }
+
+    void setHints(int index)
+    {
+        string hints = "";
+        for(int i=0; i<this.results.Count; i++)
+        {
+            if(i==index-1)
+            { 
+                hints += red_left;
+                hints += results[i];
+                hints += red_right;
+                hints += "  ";
+            }
+            else
+            {
+                hints += results[i];
+                hints += "  ";
+            }
+        }
+        hintsText.text = hints;
+    }
+
+
+
+
+    protected bool isCloseHand(Hand hand)     //是否握拳 
+    {
+        List<Finger> listOfFingers = hand.Fingers;
+        int count = 0;
+        for (int f = 0; f < listOfFingers.Count; f++)
+        { //循环遍历所有的手~~
+            Finger finger = listOfFingers[f];
+            if ((finger.TipPosition - hand.PalmPosition).Magnitude < 0.06f)    // Magnitude  向量的长度 。是(x*x+y*y+z*z)的平方根。
+                                                                               //float deltaCloseFinger = 0.05f;
+            {
+                count++;
+                //if (finger.Type == Finger.FingerType.TYPE_THUMB)
+                //Debug.Log ((finger.TipPosition - hand.PalmPosition).Magnitude);
+            }
+        }
+        return (count == 5);
+    }
+       void cleanText()
     {
 		  mFrame = mProvider.CurrentFrame;
         //判断是否为握拳状态
@@ -107,63 +321,6 @@ public class Manager : MonoBehaviour
 		if(myBool)
 
                     delInputText();
-      
-
-
-    }
-    protected bool isCloseHand(Hand hand)     //是否握拳 
-    {
-        List<Finger> listOfFingers = hand.Fingers;
-        int count = 0;
-        for (int f = 0; f < listOfFingers.Count; f++)
-        { //循环遍历所有的手~~
-            Finger finger = listOfFingers[f];
-            if ((finger.TipPosition - hand.PalmPosition).Magnitude < 0.06f)    // Magnitude  向量的长度 。是(x*x+y*y+z*z)的平方根。
-                                                                               //float deltaCloseFinger = 0.05f;
-            {
-                count++;
-                //if (finger.Type == Finger.FingerType.TYPE_THUMB)
-                //Debug.Log ((finger.TipPosition - hand.PalmPosition).Magnitude);
-            }
-        }
-        return (count == 5);
-    }
-    void listenleftdown()
-    {
-        if (mapper.LeftCursorDown)
-        {
-            string letter = leftKeyboardstatus.getClick();
-            if (!letter.Equals(""))
-            {
-                addInputText(letter);
-            }
-
-        }
-        else
-            leftKeyboardstatus.cancelClick();
-    }
-    void listenrightdown()
-    {
-        if (mapper.RightCursorDown)
-        {
-            int btn = rightKeyboardstatus.getClick();
-            if (btn != -1)
-                {
-                    Debug.Log(btn);
-                    leftKeyboardstatus.setBtn(btn);
-                }
-
-        }
-        else
-            rightKeyboardstatus.cancelClick();
-    }
-    public void addInputText(String inputString)
-    { //输入框加入字符
-        inputText.text = inputText.text + inputString;
     }
 
-    public void delInputText()
-    { //删除一个字符
-        inputText.text = inputText.text.Remove(inputText.text.Length - 1);
-    }
 }
