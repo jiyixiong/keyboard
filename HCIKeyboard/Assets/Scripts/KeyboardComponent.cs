@@ -11,15 +11,25 @@ public class KeyboardComponent : MonoBehaviour
     // public const string UP = "UP";
     // public const string LOW = "low";
 
-    public const string K11 = "1 0\ncap.,";
-    public const string K12 = "2\nABC;";
-    public const string K13 = "3\nDEF'";
+    public const string K11 = "1 0\n";
+    public const string K12 = "2\nABC";
+    public const string K13 = "3\nDEF";
     public const string K21 = "4\nGHI";
-    public const string K22 = "5\nJKL?";
-    public const string K23 = "6\nMNO\"";
+    public const string K22 = "5\nJKL";
+    public const string K23 = "6\nMNO";
     public const string K31 = "7\nPQRS";
-    public const string K32 = "8\nTUV:";
+    public const string K32 = "8\nTUV";
     public const string K33 = "9\nWXYZ";
+
+    // public const string K11 = "1 0\ncap.,";
+    // public const string K12 = "2\nABC;";
+    // public const string K13 = "3\nDEF'";
+    // public const string K21 = "4\nGHI";
+    // public const string K22 = "5\nJKL?";
+    // public const string K23 = "6\nMNO\"";
+    // public const string K31 = "7\nPQRS";
+    // public const string K32 = "8\nTUV:";
+    // public const string K33 = "9\nWXYZ";
 
     // public const int CENTER_ITEM = 15;
     // public const int KEY_NUMBER = 30;
